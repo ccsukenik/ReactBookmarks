@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Link } from 'react-router-dom';
 
 const Home = () => {
     const [bookmarks, setBookmarks] = useState();
@@ -24,7 +23,7 @@ return ( <div className='container col-md-8'>
     </thead>
     <tbody>
         {bookmarks && bookmarks.map((b,i) => <tr key={i}>
-            <td><Link to={b.url}>{b.url}</Link></td>
+            <td><a href={b.url} target="_blank">{b.url}</a></td>
             <td>{b.count}</td>
         </tr>
         )

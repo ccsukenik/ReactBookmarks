@@ -1,5 +1,4 @@
 import React, {useState} from "react";
-import { Link } from 'react-router-dom';
 
 const TableRow = ({bookmark, onDeleteClick, onUpdateClick}) => {
     const [editState, setEditState] = useState(false);
@@ -11,7 +10,7 @@ const TableRow = ({bookmark, onDeleteClick, onUpdateClick}) => {
         <td>{editState ? <input className="form-control" type='text' defaultValue={bookmark.title} onChange={onTextChange} /> 
         : bookmark.title}</td>
         <td>
-            <Link to={bookmark.url}>{bookmark.url}</Link>
+                <a href={bookmark.url} target="_blank">{bookmark.url}</a>
         </td>
         <td>
             {!editState && <button className='btn btn-success mr-3' onClick={() => setEditState(true)}>Edit Title</button>}

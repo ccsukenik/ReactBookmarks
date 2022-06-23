@@ -3,27 +3,52 @@ import { Link } from 'react-router-dom';
 import axios from 'axios';
 import TableRow from "../components/TableRow";
 import { useUser } from "../AuthContext";
-
+import { produce } from 'immer'
+    ;
 const MyBookmarks = () => {
     const { user } = useUser();
-    const [bookmarks, setBookmarks] = useState();
-
-    useEffect(() => {
-        getBookmarks();
-    }, []);
+    const [bookmarks, setBookmarks] = useState([]);
+    const [editIds, setEditIds] = useState([]);
 
     const getBookmarks = async () => {
-        const { data } = await axios.get(`/api/bookmarks/getbookmarks?id=${user.id}`);
+        const { data } = await axios.get("/api/bookmarks/getbookmarks");
         setBookmarks(data);
     }
 
-    const onDeleteClick = async (id) => {
-        await axios.post(`/api/bookmarks/deletebookmark?id=${id}`); 
+    useEffect(() => {
         getBookmarks();
+    }, [])
+
+    const onDeleteClick = async id => {
+        await axios.post("/api/bookmarks/deletebookmark", { id });
+        await getBookmarks();
     }
 
-    const onUpdateClick = async(id, title) => {
-        await axios.post("/api/bookmarks/updatebookmark", {id, title}); 
+    const onEditClick = id => {
+        setEditIds([...editIds, id]);
+    }
+
+    const onTitleChange = (evt, id) => {
+        const nextState = produce(bookmarks, draftBookmarks => {
+            const bookmark = draftBookmarks.find(b => b.id === id);
+            bookmark.title = evt.target.value;
+        });
+        setBookmarks(nextState);
+    }
+
+    const onUpdateClick = async (title, bookmarkId) => {
+        await axios.post("/api/bookmarks/updatebookmark", { title, bookmarkId });
+        await getBookmarks();
+        setEditIds(editIds.filter(id => id !== bookmarkId));
+    }
+
+    const onCancelClick = bookmarkId => {
+        const nextState = produce(bookmarks, draftBookmarks => {
+            const bookmark = draftBookmarks.find(b => b.id === bookmarkId);
+            bookmark.title = bookmark.originalTitle;
+        });
+        setBookmarks(nextState);
+        setEditIds(editIds.filter(id => id !== bookmarkId));
         getBookmarks();
     }
 
@@ -31,11 +56,12 @@ const MyBookmarks = () => {
         <div style={{ marginTop: 20 }}>
             <div className="row">
                 <div className="col-md-12">
-                    <h1>Welcome back  {`${user.firstName} ${user.lastName}`}</h1>
-                    <Link className="btn btn-primary btn-block" to="/addbookmark">Add Bookmark</Link>
+                    <h1>Welcome back {user.firstName} {user.lastName}</h1>
+                    <Link to='/add-bookmark' className="btn btn-primary btn-block">
+                        Add Bookmark
+                    </Link>
                 </div>
             </div>
-
             <div className="row" style={{ marginTop: 20 }}>
                 <table className="table table-hover table-striped table-bordered">
                     <thead>
@@ -46,12 +72,15 @@ const MyBookmarks = () => {
                         </tr>
                     </thead>
                     <tbody>
-                    {bookmarks && bookmarks.map(b => <TableRow 
-                    bookmark={b}
-                    key={b.id}
-                    onDeleteClick={() => onDeleteClick(b.id)}
-                    onUpdateClick={() => onUpdateClick(b.id, b.title)}
-                    />)}
+                        {bookmarks.map(b => <TableRow key={b.id}
+                            bookmark={b}
+                            onTitleChange={e => onTitleChange(e, b.id)}
+                            editMode={editIds.includes(b.id)}
+                            onEditClick={() => onEditClick(b.id)}
+                            onUpdateClick={() => onUpdateClick(b.title, b.id)}
+                            onCancelClick={() => onCancelClick(b.id)}
+                            onDeleteClick={() => onDeleteClick(b.id)}
+                        />)}
                     </tbody>
                 </table>
             </div>

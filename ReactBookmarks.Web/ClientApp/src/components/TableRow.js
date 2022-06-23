@@ -1,25 +1,34 @@
-import React, {useState} from "react";
+import React from "react";
 
-const TableRow = ({bookmark, onDeleteClick, onUpdateClick}) => {
-    const [editState, setEditState] = useState(false);
-    const onTextChange = e => {
-        bookmark.title = e.target.value;
-    }
+const TableRow = ({ bookmark, onEditClick, onUpdateClick, onCancelClick, onDeleteClick, editMode, onTitleChange }) => {
 
-        return (<tr>
-        <td>{editState ? <input className="form-control" type='text' defaultValue={bookmark.title} onChange={onTextChange} /> 
-        : bookmark.title}</td>
-        <td>
-                <a href={bookmark.url} target="_blank">{bookmark.url}</a>
-        </td>
-        <td>
-            {!editState && <button className='btn btn-success mr-3' onClick={() => setEditState(true)}>Edit Title</button>}
-
-            {editState && <><button className='btn btn-warning mr-3' onClick={() =>[onUpdateClick, setEditState(false)]}>Update</button>
-                <button className='btn btn-info mr-3' onClick={() => setEditState(false)}>Cancel</button></>}
-
-            <button className='btn btn-danger' onClick={onDeleteClick}>Delete</button></td>
-    </tr>)
+    return (
+        <tr>
+            <td>
+                {!editMode && bookmark.title}
+                {editMode && <input type='text'
+                    className='form-control'
+                    onChange={onTitleChange}
+                    value={bookmark.title}
+                    placeholder='Title'
+                />}
+            </td>
+            <td>
+                <a href={bookmark.url} target="_blank">
+                    {bookmark.url}
+                </a>
+            </td>
+            <td>
+                {!editMode && <button className='btn btn-success' onClick={onEditClick}>Edit Title</button>}
+                {editMode &&
+                    <>
+                        <button className='btn btn-warning' onClick={onUpdateClick}>Update</button>
+                        <button className='btn btn-info' onClick={onCancelClick}>Cancel</button>
+                    </>}
+                <button className="btn btn-danger" style={{ marginLeft: 10 }} onClick={onDeleteClick}>Delete</button>
+            </td>
+        </tr>
+    )
 }
 
 export default TableRow;

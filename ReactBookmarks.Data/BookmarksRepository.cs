@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace ReactBookmarks.Data
 {
@@ -22,11 +20,10 @@ namespace ReactBookmarks.Data
             context.SaveChanges();
         }
 
-        public void UpdateBookmark(Bookmark bookmark)
+        public void UpdateBookmark(int id, string title)
         {
             using var context = new BookmarksDataContext(_connectionString);
-            context.Update(bookmark);
-            context.SaveChanges();
+            context.Database.ExecuteSqlInterpolated($"UPDATE Bookmarks SET Title = {title} WHERE ID = {id}");
         }
 
         public void DeleteBookmark(int id)

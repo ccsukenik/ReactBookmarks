@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using ReactBookmarks.Data;
+using ReactBookmarks.Web.Models;
 
 namespace ReactBookmarks.Web.Controllers
 {
@@ -33,26 +34,27 @@ namespace ReactBookmarks.Web.Controllers
 
         [HttpGet]
         [Route("getbookmarks")]
-        public List<Bookmark> GetBookmarks(int id)
+        public List<Bookmark> GetBookmarks()
         {
+            var user = GetCurrentUser();
             var repo = new BookmarksRepository(_connectionString);
-            return repo.GetByUserID(id);
+            return repo.GetByUserID(user.ID);
         }
 
         [HttpPost]
         [Route("deletebookmark")]
-        public void DeleteBookmark(int id)
+        public void DeleteBookmark(DeleteViewModel vm)
         {
             var repo = new BookmarksRepository(_connectionString);
-            repo.DeleteBookmark(id);
+            repo.DeleteBookmark(vm.ID);
         }
 
         [HttpPost]
         [Route("updatebookmark")]
-        public void UpdateBookmark(Bookmark b)
+        public void UpdateBookmark(UpdateTitleViewModel vm)
         {
             var repo = new BookmarksRepository(_connectionString);
-            repo.UpdateBookmark(b);
+            repo.UpdateBookmark(vm.BookmarkID, vm.Title);
         }
 
         [HttpGet]
@@ -61,6 +63,13 @@ namespace ReactBookmarks.Web.Controllers
         {
             var repo = new BookmarksRepository(_connectionString);
             return repo.GetTopBookmarks();
+        }
+
+ 	private User GetCurrentUser()
+        {
+            var repo = new UserRepository(_connectionString);
+            var user = repo.GetByEmail(User.Identity.Name);
+            return user;
         }
     }
 }

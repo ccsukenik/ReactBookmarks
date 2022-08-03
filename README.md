@@ -1,5 +1,6 @@
 # ReactBookmarks
 Objective:
+
 The assignment was to create a website that allows users to log into their accounts to bookmark URLs as well as to view their previously saved bookmarks. Users also have the option to delete bookmarks, and to rename them.
 The homepage is visible to all, and displays the five most popular bookmarks.
 
